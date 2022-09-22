@@ -1,5 +1,5 @@
 export default interface ISkill {
-  id: number;
+  id?: number;
   name: string;
   rating: number;
 }

@@ -6,6 +6,7 @@ import IWilder from "../interfaces/IWilder";
 
 const Home = () => {
   const [wilders, setWilders] = useState<IWilder[]>([]);
+  const [editWilder, setEditWilder] = useState<IWilder | null>(null);
 
   useEffect(() => {
     const fetchWilders = async () => {
@@ -21,10 +22,36 @@ const Home = () => {
   }, []);
 
   const save = async (name: string) => {
-    const response = await axios.post("http://localhost:5001/api/wilders", {
-      name,
-    });
-    setWilders([...wilders, response.data]);
+    if (editWilder !== null) {
+      const response = await axios.put(
+        `http://localhost:5001/api/wilders/${editWilder.id}`,
+        {
+          name,
+        }
+      );
+      const updatedWilderIndex = wilders.findIndex(
+        (w) => w.id === editWilder.id
+      );
+      setWilders([
+        ...wilders.slice(0, updatedWilderIndex),
+        response.data,
+        ...wilders.slice(updatedWilderIndex + 1),
+      ]);
+    } else {
+      const response = await axios.post("http://localhost:5001/api/wilders", {
+        name,
+      });
+      setWilders([...wilders, response.data]);
+    }
+  };
+
+  const deleteWilder = async (wilder: IWilder) => {
+    await axios.delete(`http://localhost:5001/api/wilders/${wilder.id}`);
+    setWilders(wilders.filter((w) => w.id !== wilder.id));
+  };
+
+  const selectWilder = async (wilder: IWilder) => {
+    setEditWilder(wilder);
   };
 
   return (
@@ -36,15 +63,18 @@ const Home = () => {
       </header>
       <main className="container">
         <h2>Wilders</h2>
-        <WilderForm onSave={save} />
+        <WilderForm wilder={editWilder} onSave={save} />
         <section className="card-row">
           {wilders.map((wilder: IWilder) => (
             <Wilder
               key={wilder.id}
               wilderInfos={wilder}
-              // onDeleteButtonClicked={() => {
-              //   deleteWilder(wilder);
-              // }}
+              onDeleteButtonClicked={() => {
+                deleteWilder(wilder);
+              }}
+              onEditButtonClicked={() => {
+                selectWilder(wilder);
+              }}
             />
           ))}
         </section>
