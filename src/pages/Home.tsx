@@ -1,25 +1,36 @@
+import { gql, useQuery } from "@apollo/client";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Wilder from "../components/Wilder";
 import WilderForm from "../components/WilderForm";
 import IWilder from "../interfaces/IWilder";
 
+const GET_ALL_WILDERS = gql`
+  query {
+    getAllWilders {
+      name
+      grades {
+        votes
+        skill {
+          name
+        }
+      }
+    }
+  }
+`;
+
 const Home = () => {
   const [wilders, setWilders] = useState<IWilder[]>([]);
   const [editWilder, setEditWilder] = useState<IWilder | null>(null);
 
-  useEffect(() => {
-    const fetchWilders = async () => {
-      const response = await axios.get<IWilder[]>(
-        "http://localhost:5001/api/wilders"
-      );
-      console.log(response.data);
+  const { loading, error } = useQuery(GET_ALL_WILDERS, {
+    onCompleted: (data) => {
+      setWilders(data.getAllWilders);
+    },
+  });
 
-      setWilders(response.data);
-    };
-
-    fetchWilders();
-  }, []);
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error :(</p>;
 
   const save = async (name: string) => {
     if (editWilder !== null) {
