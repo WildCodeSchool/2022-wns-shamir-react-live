@@ -1,6 +1,7 @@
 import { gql, useQuery } from "@apollo/client";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Wilder from "../components/Wilder";
 import WilderForm from "../components/WilderForm";
 import IWilder from "../interfaces/IWilder";
@@ -22,6 +23,13 @@ const GET_ALL_WILDERS = gql`
 const Home = () => {
   const [wilders, setWilders] = useState<IWilder[]>([]);
   const [editWilder, setEditWilder] = useState<IWilder | null>(null);
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+    }
+  });
 
   const { loading, error } = useQuery(GET_ALL_WILDERS, {
     onCompleted: (data) => {
