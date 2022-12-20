@@ -5,7 +5,6 @@ import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
 
 function App() {
-  const token = localStorage.getItem("token");
   return (
     <div className="App">
       <Routes>
