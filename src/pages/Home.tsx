@@ -6,7 +6,7 @@ import Wilder from "../components/Wilder";
 import WilderForm from "../components/WilderForm";
 import IWilder from "../interfaces/IWilder";
 
-const GET_ALL_WILDERS = gql`
+export const GET_ALL_WILDERS = gql`
   query {
     getAllWilders {
       name
